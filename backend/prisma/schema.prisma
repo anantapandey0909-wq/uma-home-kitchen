@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  @@map("admin_users")
+}
+
+model MenuItem {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String   // e.g. "Breakfast & Parathas", "Kumaoni Specials", "Combos", "Beverages"
+  description String?
+  price       Float    // Decimal represented as Float for ease of serialization
+  isVeg       Boolean  @default(true)
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Index on category since it will be frequently queried and filtered by
+  @@index([category])
+  @@map("menu_items")
+}
+
+model Order {
+  id           Int      @id @default(autoincrement())
+  customerName String
+  phone        String
+  address      String   @db.Text
+  deliveryTime String
+  items        Json     // Stores JSON array of order items: { menuItemId, name, price, quantity }
+  totalAmount  Float
+  status       String   @default("Pending") // e.g. "Pending", "In Kitchen", "Out for Delivery", "Completed", "Cancelled"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Index on status for administrative dashboard filters
+  @@index([status])
+  @@map("orders")
+}
