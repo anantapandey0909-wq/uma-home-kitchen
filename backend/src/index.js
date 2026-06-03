@@ -16,13 +16,16 @@ const PORT = process.env.PORT || 5000;
 // Enable CORS with support for frontend origins
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:5173', // Vite default port
+  'http://localhost:5173',
+  'https://uma-home-kitchen.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl)
+    console.log('Request Origin:', origin);
+console.log('Allowed Origins:', allowedOrigins);
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       return callback(null, true);
