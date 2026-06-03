@@ -54,6 +54,7 @@ Total Amount: ₹${totalAmount}
 Order ID: ${newOrder.id}
 `
 });*/
+/*
 await transporter.sendMail({
   from: process.env.EMAIL_USER,
   to: email,
@@ -74,7 +75,7 @@ Regards,
 Uma Home Kitchen
 `
 });
-
+*/
     res.status(201).json({
       success: true,
       data: newOrder
