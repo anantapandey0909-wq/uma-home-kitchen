@@ -31,6 +31,7 @@ router.post('/', validateOrder, async (req, res, next) => {
 const itemsList = items
   .map(item => `${item.name} x ${item.quantity} - ₹${item.price}`)
   .join('\n');
+  /*
     await transporter.sendMail({
   from: process.env.EMAIL_USER,
   to: process.env.EMAIL_USER,
@@ -52,7 +53,7 @@ Total Amount: ₹${totalAmount}
 
 Order ID: ${newOrder.id}
 `
-});
+});*/
 await transporter.sendMail({
   from: process.env.EMAIL_USER,
   to: email,
