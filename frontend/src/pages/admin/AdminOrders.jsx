@@ -32,6 +32,7 @@ import { getOrders, updateOrderStatus } from '../../services/api';
 import { formatCurrency, formatDate } from '../../utils/format';
 import { AuthContext } from '../../context/AuthContext';
 
+
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
@@ -75,16 +76,29 @@ const AdminOrders = () => {
   };
 
   // Status mapping to Antd tag colors
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Pending': return 'orange';
-      case 'In Kitchen': return 'blue';
-      case 'Out for Delivery': return 'cyan';
-      case 'Completed': return 'green';
-      case 'Cancelled': return 'red';
-      default: return 'default';
-    }
-  };
+ const getStatusColor = (status) => {
+  switch (status) {
+    case 'Pending':
+      return 'gold';
+
+    case 'Preparing':
+    case 'In Kitchen':
+      return 'blue';
+
+   case 'Delivered':
+      return 'purple';
+
+  
+    case 'Completed':
+      return 'green';
+
+    case 'Cancelled':
+      return 'red';
+
+    default:
+      return 'default';
+  }
+};
 
   // Open detail overlay modal
   const handleOpenDetails = (order) => {
@@ -222,7 +236,18 @@ const AdminOrders = () => {
     }
   ];
 
-  const validStatuses = ['Pending', 'In Kitchen', 'Out for Delivery', 'Completed', 'Cancelled'];
+  const validStatuses = ['Pending', 'In Kitchen', 'Out for Delivery', 'Completed','Delivered', 'Cancelled'];
+  const getWhatsAppUrl = (order) => {
+  return `https://wa.me/91${order.phone.replace(/^0/, '')}?text=${encodeURIComponent(
+`Hello ${order.customerName},
+
+Your order #${order.id} from Uma Home Kitchen has been updated.
+
+Current Status: ${form.getFieldValue('status') || order.status}
+
+Thank you for ordering with us.`
+  )}`;
+};
 
   return (
     <div style={{ background: '#faf7f2', minHeight: '100vh', padding: '40px 24px' }}>
@@ -315,6 +340,31 @@ const AdminOrders = () => {
                   <Text type="secondary" style={{ display: 'block', fontSize: '11px' }}>DELIVERY ADDRESS</Text>
                   <Text style={{ fontSize: '13px', fontWeight: 600 }}>{selectedOrder.address}</Text>
                 </Col>
+                <Col xs={24}>
+  <Text type="secondary" style={{ display: 'block', fontSize: '11px' }}>
+    CUSTOMER LOCATION
+  </Text>
+
+  <Text style={{ display: 'block', fontSize: '13px' }}>
+    Latitude: {selectedOrder.latitude}
+  </Text>
+
+  <Text style={{ display: 'block', fontSize: '13px' }}>
+    Longitude: {selectedOrder.longitude}
+  </Text>
+  
+
+  <a
+    href={`https://www.google.com/maps?q=${selectedOrder.latitude},${selectedOrder.longitude}`}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <Button type="primary">
+    📍 Open in Google Maps
+  </Button>
+    
+  </a>
+</Col>
               </Row>
 
               <Divider style={{ margin: '16px 0' }} />
@@ -368,6 +418,26 @@ const AdminOrders = () => {
                     </Button>
                   </Form.Item>
                 </Form>
+                <div style={{ marginTop: '16px', textAlign: 'center' }}>
+  <Button
+    
+  href={getWhatsAppUrl(selectedOrder)}
+  target="_blank"
+  size="large"
+  style={{
+    background: '#25D366',
+    borderColor: '#25D366',
+    color: 'white',
+    fontWeight: 'bold'
+  }}
+>
+  📱 Notify Customer on WhatsApp
+</Button>
+
+
+    
+</div>
+  
               </Card>
 
             </div>

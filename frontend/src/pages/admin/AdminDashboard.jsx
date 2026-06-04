@@ -60,13 +60,17 @@ const AdminDashboard = () => {
     const today = new Date().toDateString();
     
     const ordersToday = orders.filter(order => new Date(order.createdAt).toDateString() === today);
-    const pendingOrders = orders.filter(order => ['Pending', 'In Kitchen', 'Out for Delivery'].includes(order.status));
-    const completedOrders = orders.filter(order => order.status === 'Completed');
+    const pendingOrders = orders.filter(
+  order => ['Pending', 'Preparing', 'Out for Delivery'].includes(order.status)
+);
+    const completedOrders = orders.filter(
+  order => order.status === 'Delivered'
+);
     
     // Revenue compiled from Completed orders
     const revenueToday = ordersToday
-      .filter(order => order.status === 'Completed')
-      .reduce((sum, order) => sum + order.totalAmount, 0);
+  .filter(order => order.status === 'Delivered')
+  .reduce((sum, order) => sum + order.totalAmount, 0);
 
     return {
       todayCount: ordersToday.length,
@@ -130,7 +134,7 @@ const AdminDashboard = () => {
             <Col xs={24} sm={12} md={6}>
               <Card bordered={false} style={{ borderLeft: '4px solid #52c41a' }}>
                 <Statistic 
-                  title="Completed Orders" 
+                  title="Delivered Orders"
                   value={stats.completedCount} 
                   prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
                 />

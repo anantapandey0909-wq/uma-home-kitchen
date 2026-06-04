@@ -101,7 +101,7 @@ const validateOrder = (req, res, next) => {
 
 const validateOrderStatus = (req, res, next) => {
   const { status } = req.body;
-  const validStatuses = ['Pending', 'In Kitchen', 'Out for Delivery', 'Completed', 'Cancelled'];
+  const validStatuses = ['Pending', 'In Kitchen', 'Out for Delivery', 'Completed','Delivered', 'Cancelled'];
 
   if (!status || !validStatuses.includes(status)) {
     return res.status(400).json({ 

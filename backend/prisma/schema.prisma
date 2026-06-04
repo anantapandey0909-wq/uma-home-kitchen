@@ -40,7 +40,11 @@ model Order {
   customerName String
   phone        String
   address      String   @db.Text
-  deliveryTime String
+
+latitude     Float?
+longitude    Float?
+paymentMethod String?
+deliveryTime String
   items        Json     // Stores JSON array of order items: { menuItemId, name, price, quantity }
   totalAmount  Float
   status       String   @default("Pending") // e.g. "Pending", "In Kitchen", "Out for Delivery", "Completed", "Cancelled"

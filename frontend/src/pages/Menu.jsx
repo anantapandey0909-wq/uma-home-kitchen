@@ -36,7 +36,7 @@ import {
   ShoppingOutlined
 } from '@ant-design/icons';
 
-import { getMenu, createOrder } from '../services/api';
+import { getMenu, createOrder, createPaymentOrder } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import { formatCurrency } from '../utils/format';
 
@@ -60,6 +60,37 @@ const Menu = () => {
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [submittingOrder, setSubmittingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [customerLocation, setCustomerLocation] = useState(null);
+const [locationLoading, setLocationLoading] = useState(false);
+const getCurrentLocation = () => {
+  if (!navigator.geolocation) {
+    alert('Geolocation is not supported by your browser');
+    return;
+  }
+
+  setLocationLoading(true);
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const location = {
+  latitude: position.coords.latitude,
+  longitude: position.coords.longitude
+};
+
+console.log(location);
+setCustomerLocation(location);
+
+      setLocationLoading(false);
+      alert('Location captured successfully!');
+    },
+    (error) => {
+      console.error(error);
+      setLocationLoading(false);
+      alert('Unable to get your location');
+    }
+  );
+};
   
   const [form] = Form.useForm();
   const cartSectionRef = useRef(null);
@@ -107,7 +138,53 @@ const Menu = () => {
   };
 
   // Submit Order to Backend
+  const handleOnlinePayment = async (amount) => {
+  try {
+  
+
+    console.log("Razorpay Key:", import.meta.env.VITE_RAZORPAY_KEY_ID);
+
+    const paymentResponse = await createPaymentOrder(amount);
+
+    console.log("Payment Response:", paymentResponse);
+    console.log("Window Razorpay:", window.Razorpay);
+
+  
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: paymentResponse.order.amount,
+      currency: paymentResponse.order.currency,
+      name: 'Uma Home Kitchen',
+      description: 'Food Order Payment',
+      order_id: paymentResponse.order.id,
+
+      handler: async function (response) {
+        message.success('Payment Successful!');
+        console.log('Razorpay Response:', response);
+
+        // We will place the order after successful payment
+      },
+
+      theme: {
+        color: '#e85a1e'
+      }
+    };
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+
+  } catch (error) {
+  console.error('RAZORPAY ERROR:', error);
+  message.error(
+    error?.response?.data?.message ||
+    error?.message ||
+    'Failed to initiate payment'
+  );
+}
+};
   const handleCheckout = async (values) => {
+    console.log("Selected Payment Method:", values.paymentMethod);
     if (cart.length === 0) {
       message.error('Your cart is empty! Add items to cart before checking out.');
       return;
@@ -122,15 +199,21 @@ const Menu = () => {
         email:values.email,
         address: values.address,
         deliveryTime: values.deliveryTime,
+        paymentMethod: values.paymentMethod,
         items: cart.map(item => ({
           menuItemId: item.menuItemId,
           name: item.name,
           price: item.price,
           quantity: item.quantity
         })),
-        totalAmount: cartTotal
+        totalAmount: cartTotal,
+        latitude: customerLocation?.latitude,
+longitude: customerLocation?.longitude,
       };
-
+if (values.paymentMethod === 'online') {
+  await handleOnlinePayment(cartTotal);
+  return;
+}
       const response = await createOrder(orderData);
       
       if (response.success) {
@@ -417,6 +500,19 @@ const Menu = () => {
                       </Select>
                     </Form.Item>
                   </Col>
+                  <Form.Item
+  label="Payment Method"
+  name="paymentMethod"
+  initialValue="cod"
+>
+  <Select
+    size="large"
+    onChange={(value) => setPaymentMethod(value)}
+  >
+    <Option value="cod">Cash on Delivery</Option>
+    <Option value="online">Pay Online (Razorpay)</Option>
+  </Select>
+</Form.Item>
 
                   {/* Delivery Location */}
                   <Col xs={24} md={12}>
@@ -424,6 +520,7 @@ const Menu = () => {
                       name="address"
                       label="Full Delivery Address"
                       rules={[{ required: true, message: 'Please enter your delivery address' }]}
+                      
                     >
                       <Input.TextArea 
                         rows={6} 
@@ -431,6 +528,27 @@ const Menu = () => {
                         size="large"
                       />
                     </Form.Item>
+                    <Button
+  type="dashed"
+  onClick={getCurrentLocation}
+  loading={locationLoading}
+  style={{ marginTop: '8px' }}
+>
+  📍 Use My Current Location
+</Button>
+{customerLocation && (
+  <div style={{ marginTop: '8px', color: 'green' }}>
+    ✅ Location captured
+
+    <br />
+
+    Lat: {customerLocation.latitude}
+
+    <br />
+
+    Lng: {customerLocation.longitude}
+  </div>
+)}
                   </Col>
 
                 </Row>

@@ -12,7 +12,7 @@ const router = express.Router();
  * @access  Public
  */
 router.post('/', validateOrder, async (req, res, next) => {
-  const { customerName, email,phone, address, deliveryTime, items, totalAmount } = req.body;
+  const { customerName, email,phone, address, deliveryTime, paymentMethod,items, totalAmount,latitude,longitude } = req.body;
 
   try {
     const newOrder = await prisma.order.create({
@@ -20,10 +20,15 @@ router.post('/', validateOrder, async (req, res, next) => {
         customerName: customerName.trim(),
         phone: phone.trim(),
         address: address.trim(),
+        latitude,
+        longitude,
         deliveryTime: deliveryTime.trim(),
+        paymentMethod,
+        
         items, // Stores directly in JSON Column (jsonb in PostgreSQL)
         totalAmount,
         status: 'Pending' // Initial default status
+
       }
     });
     const orderTime = new Date().toLocaleString();
@@ -31,51 +36,7 @@ router.post('/', validateOrder, async (req, res, next) => {
 const itemsList = items
   .map(item => `${item.name} x ${item.quantity} - ₹${item.price}`)
   .join('\n');
-  /*
-    await transporter.sendMail({
-  from: process.env.EMAIL_USER,
-  to: process.env.EMAIL_USER,
-  subject: 'New Order Received - Uma Home Kitchen',
-  text: `
-New Order Received
-
-Order Time: ${orderTime}
-
-Customer: ${customerName}
-Phone: ${phone}
-Address: ${address}
-Delivery Time: ${deliveryTime}
-
-Items:
-${itemsList}
-
-Total Amount: ₹${totalAmount}
-
-Order ID: ${newOrder.id}
-`
-});*/
-/*
-await transporter.sendMail({
-  from: process.env.EMAIL_USER,
-  to: email,
-  subject: 'Order Confirmation - Uma Home Kitchen',
-  text: `
-Dear ${customerName},
-
-Thank you for your order from Uma Home Kitchen.
-
-Order ID: ${newOrder.id}
-Total Amount: ₹${totalAmount}
-
-We have received your order and will start preparing it shortly.
-
-Thank you for choosing Uma Home Kitchen!
-
-Regards,
-Uma Home Kitchen
-`
-});
-*/
+  
     res.status(201).json({
       success: true,
       data: newOrder

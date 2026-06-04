@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Card, Typography, Button, Space, Table, Result, Divider } from 'antd';
+import { Card, Typography, Button, Space, Table, Result, Divider, Row, Col } from 'antd';
 import { CheckCircleOutlined, PhoneOutlined, ArrowLeftOutlined, ShoppingOutlined } from '@ant-design/icons';
 import { formatCurrency } from '../utils/format';
 
@@ -66,7 +66,25 @@ const OrderConfirmation = () => {
       render: (_, record) => formatCurrency(record.price * record.quantity)
     }
   ];
+const whatsappMessage = `
+Hello Uma Home Kitchen,
 
+I have placed an order.
+
+Order ID: ${order.id}
+
+Name: ${order.customerName}
+Phone: ${order.phone}
+Address: ${order.address}
+
+Total Amount: ₹${order.totalAmount}
+
+Please confirm my order.
+
+Thank you.
+`;
+
+const whatsappUrl = `https://wa.me/918954327490?text=${encodeURIComponent(whatsappMessage)}`;
   return (
     <div style={{ background: '#faf7f2', minHeight: '100vh', padding: '48px 24px' }}>
       <div style={{ maxWidth: '750px', margin: '0 auto' }}>
@@ -139,20 +157,44 @@ const OrderConfirmation = () => {
         {/* Callback Help Action Buttons */}
         <div style={{ textAlign: 'center' }}>
           <Space size="middle" wrap>
+
             <Link to="/menu">
               <Button type="primary" size="large" icon={<ShoppingOutlined />} style={{ background: '#e85a1e', borderColor: '#e85a1e', fontWeight: 'bold' }}>
                 Place Another Order
               </Button>
             </Link>
-            <Button size="large" icon={<PhoneOutlined />} href="tel:+918954327490" style={{ color: '#8b5a2b', borderColor: '#8b5a2b', fontWeight: 'bold' }}>
-              Call to Modify Order (+91 89543 27490)
-            </Button>
-          </Space>
-        </div>
+            <Button
+  size="large"
+  icon={<PhoneOutlined />}
+  href="tel:+918954327490"
+  style={{
+    color: '#8b5a2b',
+    borderColor: '#8b5a2b',
+    fontWeight: 'bold'
+  }}
+>
+  Call to Modify Order (+91 89543 27490)
+</Button>
 
-      </div>
-    </div>
+<Button
+  size="large"
+  href={whatsappUrl}
+  target="_blank"
+  style={{
+    background: '#25D366',
+    borderColor: '#25D366',
+    color: 'white',
+    fontWeight: 'bold'
+  }}
+>
+  💬 Confirm on WhatsApp
+</Button>
+</Space>
+</div>
+</div>
+</div>
   );
 };
-
+              
 export default OrderConfirmation;
+

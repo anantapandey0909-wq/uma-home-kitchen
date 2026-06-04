@@ -8,6 +8,7 @@ const { checkConnection } = require('./config/database');
 const authRoutes = require('./routes/auth');
 const menuRoutes = require('./routes/menu');
 const orderRoutes = require('./routes/orders');
+const paymentRoutes = require('./routes/payment');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -48,6 +49,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
