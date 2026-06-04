@@ -20,6 +20,7 @@ router.post('/login', validateLogin, async (req, res, next) => {
     const admin = await prisma.adminUser.findUnique({
       where: { email: email.trim().toLowerCase() }
     });
+    console.log("Admin found:", admin);
 
     if (!admin) {
       return res.status(401).json({
