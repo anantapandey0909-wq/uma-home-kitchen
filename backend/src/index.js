@@ -19,6 +19,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'https://uma-home-kitchen.vercel.app',
+  'https://uma-home-kitchen-git-main-ananta-s-projects2.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
