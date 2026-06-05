@@ -24,16 +24,7 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl)
-    console.log('Request Origin:', origin);
-console.log('Allowed Origins:', allowedOrigins);
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-    return callback(new Error('CORS Policy Denied'), false);
-  },
+  origin: true,
   credentials: true
 }));
 
